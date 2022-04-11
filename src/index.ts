@@ -48,8 +48,8 @@ class VoiceSession extends EventEmitter {
             this.emit('userJoined', this.VOICE_MEMBERS.get(user.id));
         });
         this.RPC_CLIENT.on('VOICE_STATE_DELETE', ({user}: Types.VoiceState) => {
-            this.VOICE_MEMBERS.delete(user.id);
             this.emit('userLeft', this.VOICE_MEMBERS.get(user.id));
+            this.VOICE_MEMBERS.delete(user.id);
             if (user.id == this.RPC_CLIENT.client.user.id) this.disconnect();
         });
         this.RPC_CLIENT.on('VOICE_STATE_UPDATE', ({user, voice_state}: Types.VoiceState) => {
@@ -66,10 +66,10 @@ class VoiceSession extends EventEmitter {
         this.RPC_CLIENT.on('SPEAKING_STOP', ({user_id}: Types.VoiceChannel) => this.emit('userStoppedSpeaking', this.VOICE_MEMBERS.get(user_id)));
         
         this.RPC_CLIENT.on('ready', async () => {
-            await this.RPC_CLIENT.subscribe('VOICE_CHANNEL_SELECT');
             this.CHANNEL_ID = (await this.RPC_CLIENT.getSelectedVoiceChannel())?.id || null;
             this.init(this.CHANNEL_ID);
-
+            
+            await this.RPC_CLIENT.subscribe('VOICE_CHANNEL_SELECT');
             this.emit('ready', this.RPC_CLIENT.user, this.RPC_CLIENT.accessToken);
         });
 

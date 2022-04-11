@@ -26,6 +26,7 @@ class VoiceSession extends events_1.default {
         this.START_SPEAKING_EVENT = null;
         this.STOP_SPEAKING_EVENT = null;
         this.UPDATE_EVENT = null;
+        this.CHANNEL_SELECT_EVENT = null;
         this.VOICE_MEMBERS = new collection_1.Collection();
         this.RPC_CLIENT = new RPC.Client({ transport: 'ipc' });
     }
@@ -42,8 +43,8 @@ class VoiceSession extends events_1.default {
                 this.emit('userJoined', this.VOICE_MEMBERS.get(user.id));
             });
             this.RPC_CLIENT.on('VOICE_STATE_DELETE', ({ user }) => {
-                this.VOICE_MEMBERS.delete(user.id);
                 this.emit('userLeft', this.VOICE_MEMBERS.get(user.id));
+                this.VOICE_MEMBERS.delete(user.id);
                 if (user.id == this.RPC_CLIENT.client.user.id)
                     this.disconnect();
             });
@@ -60,9 +61,9 @@ class VoiceSession extends events_1.default {
             this.RPC_CLIENT.on('SPEAKING_STOP', ({ user_id }) => this.emit('userStoppedSpeaking', this.VOICE_MEMBERS.get(user_id)));
             this.RPC_CLIENT.on('ready', () => __awaiter(this, void 0, void 0, function* () {
                 var _a;
-                yield this.RPC_CLIENT.subscribe('VOICE_CHANNEL_SELECT');
                 this.CHANNEL_ID = ((_a = (yield this.RPC_CLIENT.getSelectedVoiceChannel())) === null || _a === void 0 ? void 0 : _a.id) || null;
                 this.init(this.CHANNEL_ID);
+                this.CHANNEL_SELECT_EVENT = yield this.RPC_CLIENT.subscribe('VOICE_CHANNEL_SELECT');
                 this.emit('ready', this.RPC_CLIENT.user, this.RPC_CLIENT.accessToken);
             }));
             this.RPC_CLIENT.login({ clientId, redirectUri, scopes, clientSecret, accessToken });

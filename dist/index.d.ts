@@ -16,6 +16,7 @@ declare class VoiceSession extends EventEmitter {
     private START_SPEAKING_EVENT;
     private STOP_SPEAKING_EVENT;
     private UPDATE_EVENT;
+    private CHANNEL_SELECT_EVENT;
     private VOICE_MEMBERS;
     private RPC_CLIENT;
     constructor();
