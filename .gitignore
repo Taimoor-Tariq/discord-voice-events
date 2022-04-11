@@ -1,0 +1,8 @@
+.idea
+.vscode
+.npmrc
+node_modules
+scripts
+test
+
+package-lock.json

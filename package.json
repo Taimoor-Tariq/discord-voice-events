@@ -1,0 +1,36 @@
+{
+    "name": "discord-voice-events",
+    "version": "0.0.1",
+    "description": "Discord Voice Events Listener",
+    "main": "dist/index.js",
+    "license": "MIT",
+    "scripts": {
+        "build": "tsc",
+        "build:watch": "tsc --watch",
+        "publish:npm": "node ./scripts/publish-npm.js && npm publish",
+        "publish:github": "node ./scripts/publish-github.js && npm publish",
+        "publish:all": "npm run publish:github && npm run publish:npm"
+    },
+    "devDependencies": {
+        "typescript": "^4.6.2"
+    },
+    "repository": {
+        "url": "https://github.com/Taimoor-Tariq/discord-voice-events.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Taimoor-Tariq/discord-voice-events/issues"
+    },
+    "homepage": "https://github.com/Taimoor-Tariq/discord-voice-events",
+    "files": [
+        "dist/**/*"
+    ],
+    "prepare": "yarn run build",
+    "types": "dist/index.d.ts",
+    "keywords": [
+        "discord",
+        "discord voice",
+        "discord voice events",
+        "discord rpc",
+        "discord rpc voice events"
+    ]
+}
