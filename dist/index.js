@@ -14,8 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VoiceSession = void 0;
 const events_1 = __importDefault(require("events"));
-const collection_1 = require("./lib/collection");
-const RPC = require('./lib/rpc');
+const collection_js_1 = require("@Taimoor-Tariq/collection-js");
+const RPC = require('@Taimoor-Tariq/discord-rpc');
 const scopes = ['rpc', 'rpc.voice.read', 'rpc.voice.write'];
 class VoiceSession extends events_1.default {
     constructor() {
@@ -26,8 +26,7 @@ class VoiceSession extends events_1.default {
         this.START_SPEAKING_EVENT = null;
         this.STOP_SPEAKING_EVENT = null;
         this.UPDATE_EVENT = null;
-        this.CHANNEL_SELECT_EVENT = null;
-        this.VOICE_MEMBERS = new collection_1.Collection();
+        this.VOICE_MEMBERS = new collection_js_1.Collection();
         this.RPC_CLIENT = new RPC.Client({ transport: 'ipc' });
     }
     start({ clientId, clientSecret, redirectUri = 'http://localhost:9877/', accessToken = null }) {
@@ -61,9 +60,9 @@ class VoiceSession extends events_1.default {
             this.RPC_CLIENT.on('SPEAKING_STOP', ({ user_id }) => this.emit('userStoppedSpeaking', this.VOICE_MEMBERS.get(user_id)));
             this.RPC_CLIENT.on('ready', () => __awaiter(this, void 0, void 0, function* () {
                 var _a;
-                this.CHANNEL_ID = ((_a = (yield this.RPC_CLIENT.getSelectedVoiceChannel())) === null || _a === void 0 ? void 0 : _a.id) || null;
+                this.CHANNEL_ID = ((_a = (yield this.RPC_CLIENT.request(RPC.Commands.GET_SELECTED_VOICE_CHANNEL))) === null || _a === void 0 ? void 0 : _a.id) || null;
                 this.init(this.CHANNEL_ID);
-                this.CHANNEL_SELECT_EVENT = yield this.RPC_CLIENT.subscribe('VOICE_CHANNEL_SELECT');
+                yield this.RPC_CLIENT.subscribe('VOICE_CHANNEL_SELECT');
                 this.emit('ready', this.RPC_CLIENT.user, this.RPC_CLIENT.accessToken);
             }));
             this.RPC_CLIENT.login({ clientId, redirectUri, scopes, clientSecret, accessToken });
@@ -80,7 +79,9 @@ class VoiceSession extends events_1.default {
             this.START_SPEAKING_EVENT = yield this.RPC_CLIENT.subscribe('SPEAKING_START', { channel_id: id });
             this.STOP_SPEAKING_EVENT = yield this.RPC_CLIENT.subscribe('SPEAKING_STOP', { channel_id: id });
             this.UPDATE_EVENT = yield this.RPC_CLIENT.subscribe('VOICE_STATE_UPDATE', { channel_id: id });
-            (yield this.RPC_CLIENT.getChannel(id)).voice_states.map((u) => {
+            (yield this.RPC_CLIENT.request(RPC.Commands.GET_CHANNEL, {
+                channel_id: id
+            })).voice_states.map((u) => {
                 this.VOICE_MEMBERS.set(u.user.id, {
                     id: u.user.id,
                     username: u.user.username,

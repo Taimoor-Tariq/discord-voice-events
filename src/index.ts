@@ -1,8 +1,8 @@
 import * as Types from './deps';
 import EventEmitter from 'events';
-import { Collection } from './lib/collection';
+import { Collection } from '@Taimoor-Tariq/collection-js';
 
-const RPC = require('./lib/rpc');
+const RPC = require('@Taimoor-Tariq/discord-rpc');
 const scopes = ['rpc', 'rpc.voice.read', 'rpc.voice.write'];
 
 declare interface VoiceSession {
@@ -66,7 +66,7 @@ class VoiceSession extends EventEmitter {
         this.RPC_CLIENT.on('SPEAKING_STOP', ({user_id}: Types.VoiceChannel) => this.emit('userStoppedSpeaking', this.VOICE_MEMBERS.get(user_id)));
         
         this.RPC_CLIENT.on('ready', async () => {
-            this.CHANNEL_ID = (await this.RPC_CLIENT.getSelectedVoiceChannel())?.id || null;
+            this.CHANNEL_ID = (await this.RPC_CLIENT.request(RPC.Commands.GET_SELECTED_VOICE_CHANNEL))?.id || null;
             this.init(this.CHANNEL_ID);
             
             await this.RPC_CLIENT.subscribe('VOICE_CHANNEL_SELECT');
@@ -87,7 +87,9 @@ class VoiceSession extends EventEmitter {
         this.STOP_SPEAKING_EVENT = await this.RPC_CLIENT.subscribe('SPEAKING_STOP', {channel_id: id});
         this.UPDATE_EVENT = await this.RPC_CLIENT.subscribe('VOICE_STATE_UPDATE', {channel_id: id});
 
-        (await this.RPC_CLIENT.getChannel(id)).voice_states.map((u: Types.VoiceState) => {
+        (await this.RPC_CLIENT.request(RPC.Commands.GET_CHANNEL, {
+            channel_id: id
+        })).voice_states.map((u: Types.VoiceState) => {
             this.VOICE_MEMBERS.set(u.user.id, {
                 id: u.user.id,
                 username: u.user.username,
