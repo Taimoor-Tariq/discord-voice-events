@@ -17,7 +17,7 @@ const events_1 = __importDefault(require("events"));
 const collection_js_1 = require("@Taimoor-Tariq/collection-js");
 const RPC = require('@Taimoor-Tariq/discord-rpc');
 const scopes = ['rpc', 'rpc.voice.read', 'rpc.voice.write'];
-class VoiceSession extends events_1.default {
+class VoiceSessionHandeler extends events_1.default {
     constructor() {
         super();
         this.CHANNEL_ID = null;
@@ -44,7 +44,7 @@ class VoiceSession extends events_1.default {
             this.RPC_CLIENT.on('VOICE_STATE_DELETE', ({ user }) => {
                 this.emit('userLeft', this.VOICE_MEMBERS.get(user.id));
                 this.VOICE_MEMBERS.delete(user.id);
-                if (user.id == this.RPC_CLIENT.client.user.id)
+                if (user.id == this.RPC_CLIENT.user.id)
                     this.disconnect();
             });
             this.RPC_CLIENT.on('VOICE_STATE_UPDATE', ({ user, voice_state }) => {
@@ -119,6 +119,28 @@ class VoiceSession extends events_1.default {
             this.VOICE_MEMBERS.clear();
         });
     }
+}
+class VoiceSession {
+    constructor() {
+        this.SESSION = new VoiceSessionHandeler();
+    }
+    ;
+    start({ clientId, clientSecret, redirectUri = 'http://localhost:9877/', accessToken = null }) {
+        this.SESSION.start({ clientId, clientSecret, redirectUri, accessToken });
+    }
+    ;
+    onReady(callback) { this.SESSION.on('ready', callback); }
+    ;
+    onUserJoined(callback) { this.SESSION.on('userJoined', callback); }
+    ;
+    onUserLeft(callback) { this.SESSION.on('userLeft', callback); }
+    ;
+    onUserUpdated(callback) { this.SESSION.on('userUpdated', callback); }
+    ;
+    onUserStartedSpeaking(callback) { this.SESSION.on('userStartedSpeaking', callback); }
+    ;
+    onUserStoppedSpeaking(callback) { this.SESSION.on('userStoppedSpeaking', callback); }
+    ;
 }
 exports.VoiceSession = VoiceSession;
 //# sourceMappingURL=index.js.map

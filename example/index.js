@@ -1,17 +1,17 @@
 const { VoiceSession } = require('discord-voice-events');
 const session = new VoiceSession();
 
-session.on('ready', (user, token) => {
+session.onReady((user, token) => {
     console.log(`Authenticated as ${user.username}#${user.discriminator} (${user.id})`);
     console.log(`Token: ${token}`); // Can store this token for later use.
 });
 
-session.on('userStartedSpeaking', user => console.log(`${user.username} started speaking.`));
-session.on('userStoppedSpeaking', user => console.log(`${user.username} stopped speaking.`));
+session.onUserStartedSpeaking((user) => console.log(`${user.username} started speaking.`));
+session.onUserStoppedSpeaking((user) => console.log(`${user.username} stopped speaking.`));
 
-session.on('userJoined', user => console.log(`${user.username} joined.`));
-session.on('userLeft', user => console.log(`${user.username} left.`));
-session.on('userUpdated', user => console.log(`${user.username} updated.`));
+session.onUserJoined((user) => console.log(`${user.username} joined.`));
+session.onUserLeft((user) => console.log(`${user.username} left.`));
+session.onUserUpdated((user) => console.log(`${user.username} updated.`));
 
 session.start({
     clientId: process.env.CLIENT_ID,

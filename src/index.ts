@@ -5,7 +5,7 @@ import { Collection } from '@Taimoor-Tariq/collection-js';
 const RPC = require('@Taimoor-Tariq/discord-rpc');
 const scopes = ['rpc', 'rpc.voice.read', 'rpc.voice.write'];
 
-declare interface VoiceSession {
+declare interface VoiceSessionHandeler {
     on(eventName: 'ready', listener: (user: Types.User, accessToken: string) => void): this;
     on(eventName: 'userStartedSpeaking', listener: (user: Types.VoiceUser) => void): this;
     on(eventName: 'userStoppedSpeaking', listener: (user: Types.VoiceUser) => void): this;
@@ -14,7 +14,7 @@ declare interface VoiceSession {
     on(eventName: 'userUpdated', listener: (user: Types.VoiceUser) => void): this;
 }
 
-class VoiceSession extends EventEmitter {
+class VoiceSessionHandeler extends EventEmitter {
     private CHANNEL_ID: string | null;
     private JOIN_EVENT: Types.SubscribedEvent | null;
     private LEAVE_EVENT: Types.SubscribedEvent | null;
@@ -50,7 +50,7 @@ class VoiceSession extends EventEmitter {
         this.RPC_CLIENT.on('VOICE_STATE_DELETE', ({user}: Types.VoiceState) => {
             this.emit('userLeft', this.VOICE_MEMBERS.get(user.id));
             this.VOICE_MEMBERS.delete(user.id);
-            if (user.id == this.RPC_CLIENT.client.user.id) this.disconnect();
+            if (user.id == this.RPC_CLIENT.user.id) this.disconnect();
         });
         this.RPC_CLIENT.on('VOICE_STATE_UPDATE', ({user, voice_state}: Types.VoiceState) => {
             this.VOICE_MEMBERS.set(user.id, {
@@ -68,8 +68,8 @@ class VoiceSession extends EventEmitter {
         this.RPC_CLIENT.on('ready', async () => {
             this.CHANNEL_ID = (await this.RPC_CLIENT.request(RPC.Commands.GET_SELECTED_VOICE_CHANNEL))?.id || null;
             this.init(this.CHANNEL_ID);
-            
             await this.RPC_CLIENT.subscribe('VOICE_CHANNEL_SELECT');
+            
             this.emit('ready', this.RPC_CLIENT.user, this.RPC_CLIENT.accessToken);
         });
 
@@ -124,6 +124,25 @@ class VoiceSession extends EventEmitter {
         this.UPDATE_EVENT = null;
         this.VOICE_MEMBERS.clear();
     }
+}
+
+class VoiceSession {
+    private SESSION: any;
+
+    constructor() {
+        this.SESSION = new VoiceSessionHandeler();
+    };
+
+    start({ clientId, clientSecret, redirectUri='http://localhost:9877/', accessToken=null }: Types.StartMethod) {
+        this.SESSION.start({ clientId, clientSecret, redirectUri, accessToken });
+    };
+
+    onReady(callback: (user: Types.User, accessToken: string) => void) { this.SESSION.on('ready', callback) };
+    onUserJoined(callback: (user: Types.User) => void) { this.SESSION.on('userJoined', callback) };
+    onUserLeft(callback: (user: Types.User) => void) { this.SESSION.on('userLeft', callback) };
+    onUserUpdated(callback: (user: Types.User) => void) { this.SESSION.on('userUpdated', callback) };
+    onUserStartedSpeaking(callback: (user: Types.User) => void) { this.SESSION.on('userStartedSpeaking', callback) };
+    onUserStoppedSpeaking(callback: (user: Types.User) => void) { this.SESSION.on('userStoppedSpeaking', callback) };
 }
 
 export { VoiceSession };
