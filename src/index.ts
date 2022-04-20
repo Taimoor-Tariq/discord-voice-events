@@ -3,7 +3,7 @@ import EventEmitter from 'events';
 import { Collection } from '@Taimoor-Tariq/collection-js';
 
 const RPC = require('@Taimoor-Tariq/discord-rpc');
-const scopes = ['rpc', 'rpc.voice.read', 'rpc.voice.write'];
+const scopes = ['rpc', 'rpc.voice.read'];
 
 declare interface VoiceSessionHandeler {
     on(eventName: 'ready', listener: (user: Types.User, accessToken: string) => void): this;

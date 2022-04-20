@@ -16,7 +16,7 @@ exports.VoiceSession = void 0;
 const events_1 = __importDefault(require("events"));
 const collection_js_1 = require("@Taimoor-Tariq/collection-js");
 const RPC = require('@Taimoor-Tariq/discord-rpc');
-const scopes = ['rpc', 'rpc.voice.read', 'rpc.voice.write'];
+const scopes = ['rpc', 'rpc.voice.read'];
 class VoiceSessionHandeler extends events_1.default {
     constructor() {
         super();
